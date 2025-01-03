@@ -194,9 +194,9 @@ class ADB:
     def install(self, path: str, args: list[str] = ['r', 't', 'd']) -> str:
         argsstr = ''
         for i in args:
-            argsstr = argsstr + '-' + i + ' '
+            argsstr = argsstr + '' + '-' + i
         logging.debug(f'安装应用{path}, 参数:{args}')
-        return self.adb(f'install {path}{args}')
+        return self.adb(f'install {path}{argsstr}')
 
     def loop_install(self, path: str, args: list[str] = ['r', 't', 'd'], sleeptime: int | float = 2) -> None:
         """
