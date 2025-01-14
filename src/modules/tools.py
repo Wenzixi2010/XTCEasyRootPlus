@@ -92,25 +92,27 @@ def download_file(url: str, filename: str = '', progress_enable: bool = True) ->
         ) as progress:
             # 发起 HTTP 请求，流式获取内容
             with requests.get(url, stream=True) as r:
-                # 获取文件总大小
-                total_size = round(
-                    int(r.headers.get('content-length', 0))/1024)
-                # 在进度条中创建一个任务
-                task_id = progress.add_task("download", total=total_size)
-                # 打开文件以写入
+                if r.status_code == 200:
+                    # 获取文件总大小
+                    total_size = round(
+                        int(r.headers.get('content-length', 0))/1024)
+                    # 在进度条中创建一个任务
+                    task_id = progress.add_task("download", total=total_size)
+                    # 打开文件以写入
+                    with open(filename, 'wb') as f:
+                        for chunk in r.iter_content(chunk_size=1024):  # 每次读取 1KB
+                            if chunk:  # 确保读取的内容非空
+                                f.write(chunk)
+                                # 更新进度条
+                                progress.update(
+                                    task_id, advance=round(len(chunk)/1024))
+    else:
+        with requests.get(url, stream=True) as r:
+            if r.status_code == 200:
                 with open(filename, 'wb') as f:
                     for chunk in r.iter_content(chunk_size=1024):  # 每次读取 1KB
                         if chunk:  # 确保读取的内容非空
                             f.write(chunk)
-                            # 更新进度条
-                            progress.update(
-                                task_id, advance=round(len(chunk)/1024))
-    else:
-        with requests.get(url, stream=True) as r:
-            with open(filename, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=1024):  # 每次读取 1KB
-                    if chunk:  # 确保读取的内容非空
-                        f.write(chunk)
 
 
 def print_logo(version: list[Any]) -> None:

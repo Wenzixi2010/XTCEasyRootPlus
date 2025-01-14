@@ -18,7 +18,7 @@ from tkinter import filedialog
 from modules import logging
 # import traceback
 
-version: list[int | Literal['b']] = [2, 0, 'b', 2]
+version: list[int | Literal['b']] = [2, 0]
 
 if not os.path.exists('logs/'):
     os.mkdir('logs')
@@ -67,8 +67,9 @@ status.update('正在检查更新')
 status.start()
 logging.debug(f'当前版本:{version[0]}.{version[1]}')
 logging.info('检查最新版本')
+rainyun = requests.get('https://cn-nb1.rains3.com/xtceasyrootplus/version.json').status_code == 200
 try:  # 尝试获取版本文件
-    with requests.get('https://cn-nb1.rains3.com/xtceasyrootplus/version.json') as r:  # 获取版本信息
+    with requests.get(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}version.json') as r:  # 获取版本信息
         read = r.content
         try:
             read = json.loads(read)
@@ -79,12 +80,12 @@ try:  # 尝试获取版本文件
             tools.exit_after_enter()
     latest_version = read
     logging.debug(f'最新版本:{latest_version[0]}.{latest_version[1]}')
-    if ((latest_version[0] >= version[0] and latest_version[1] > version[1]) if not len(version) >= 3 and version[2] == 'b' else (latest_version[0] >= version[0] and latest_version[1] >= version[1])):
+    if ((latest_version[0] >= version[0] and latest_version[1] > version[1]) if not len(version) >= 3 else (latest_version[0] >= version[0] and latest_version[1] >= version[1])):
         logging.info(f'发现新版本:{latest_version[0]}.{latest_version[1]}')
         logging.info('开始下载新版本......')
         status.stop()
         tools.download_file(
-            'https://cn-nb1.rains3.com/xtceasyrootplus/XTCEasyRootPlusInstaller.exe', 'tmp/XTCEasyRootPlusInstaller.exe')
+            f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}XTCEasyRootPlusInstaller.exe', 'tmp/XTCEasyRootPlusInstaller.exe')
         subprocess.Popen('tmp/XTCEasyRootPlusInstaller.exe')
         sys.exit()
 except requests.ConnectionError as e:  # 捕捉下载失败错误
@@ -118,6 +119,8 @@ while True:
     tools.print_logo(version)
     print(f'\nXTCEasyRootPlus [blue]v{version[0]}.{version[1]}{' beta' if debug else ''}{f' {version[3]}' if debug else ''}[/blue]')
     print('本软件是[green]免费公开使用[/green]的，如果你是付费买来的请马上退款，你被骗了！\n')
+    print('[red]XTCEasyRootPlus 已经停止维护! 因继续使用 XTCEasyRootPlus 导致的任何问题我们概不负责![/red]')
+    print('[red]详情请见 https://github.com/OnesoftQwQ/XTCEasyRootPlus/issues/5[/red]\n')
     logging.debug('进入主菜单')
     choice = noneprompt.ListPrompt(
         '请选择功能',
@@ -214,7 +217,7 @@ while True:
                 logging.info('下载文件')
                 status.update('下载文件')
                 tools.download_file(
-                    f'https://cn-nb1.rains3.com/xtceasyrootplus/{model}.zip', f'tmp/{model}.zip')
+                    f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}{model}.zip', f'tmp/{model}.zip')
 
                 logging.info('解压文件')
                 status.update('解压文件')
@@ -224,14 +227,14 @@ while True:
                 logging.info('下载userdata')
                 if magisk == '25200':
                     tools.download_file(
-                        'https://cn-nb1.rains3.com/xtceasyrootplus/1userdata.img', 'tmp/userdata.img')
+                        f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}1userdata.img', 'tmp/userdata.img')
                 elif magisk == '25210':
                     tools.download_file(
-                        'https://cn-nb1.rains3.com/xtceasyrootplus/2userdata.img', 'tmp/userdata.img')
+                        f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}2userdata.img', 'tmp/userdata.img')
 
             if android_version == '7.1' or not is_v3: # type: ignore
                 logging.debug('获取桌面版本列表')
-                with requests.get('https://cn-nb1.rains3.com/xtceasyrootplus/launchers.json') as r:
+                with requests.get(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}launchers.json') as r:
                     read = r.content
                     try:
                         if android_version == '7.1':
@@ -274,14 +277,14 @@ while True:
                     filelist = ['appstore.apk', 'moyeinstaller.apk', 'xtctoolbox.apk','filemanager.apk', 'notice.apk', 'toolkit.apk', launcher, 'xws.apk', 'wxzf.apk']
                     for i in filelist:
                         tools.download_file(
-                            f'https://cn-nb1.rains3.com/xtceasyrootplus/apps/{i}', f'tmp/{i}', progress_enable=False)
+                            f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}apps/{i}', f'tmp/{i}', progress_enable=False)
                 elif android_version == '8.1':
                     filelist = ['appstore.apk', 'notice.apk', 'wxzf.apk', 'wcp2.apk', 'datacenter.apk','xws.apk', launcher, 'filemanager.apk', 'settings.apk', 'systemplus.apk', 'moyeinstaller.apk']
                     for i in filelist:
-                        tools.download_file(f'https://cn-nb1.rains3.com/xtceasyrootplus/apps/{i}', f'tmp/{i}', progress_enable=False)
-                    tools.download_file(f'https://cn-nb1.rains3.com/xtceasyrootplus/xtcpatch.zip', 'tmp/xtcpatch.zip', progress_enable=False)
+                        tools.download_file(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}apps/{i}', f'tmp/{i}', progress_enable=False)
+                    tools.download_file(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}xtcpatch.zip', 'tmp/xtcpatch.zip', progress_enable=False)
                     if doze:
-                        tools.download_file(f'https://cn-nb1.rains3.com/xtceasyrootplus/doze.zip', 'tmp/doze.zip', progress_enable=False)
+                        tools.download_file(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}doze.zip', 'tmp/doze.zip', progress_enable=False)
 
             download_thread = threading.Thread(target=download_all_files)
             download_thread.start()
@@ -1182,125 +1185,128 @@ while True:
                 input('恭喜你,Root成功!按回车返回主界面')
 
         case '2.超级恢复(救砖/降级/恢复原版系统)':
-            try:
-                status.update('获取超级恢复列表')
-                status.start()
-                logging.info('获取超级恢复列表')
-                with requests.get('https://cn-nb1.rains3.com/xtceasyrootplus/superrecovery.json') as r:
-                    superrecovery: dict[str, dict[str, str]] = json.loads(r.content)
-
-                logging.info('获取成功!')
-
-                logging.info('尝试自动识别机型')
-                status.update('获取机型')
-                if adb.is_connect():
-                    info = adb.get_info()
-                    model = tools.xtc_models[info['innermodel']]
-                    logging.info('获取成功')
-                    status.stop()
-                else:
-                    logging.info('获取失败,进入手动选择')
-                    status.stop()
-                    choices: list[noneprompt.Choice[None]] = []
-                    for i, x in enumerate(superrecovery.keys()):
-                        choices.append(noneprompt.Choice(f'{i+1}.{x}'))
-                    choice = noneprompt.ListPrompt('请选择你的机型', choices).prompt()
-                    model = choice.name.split('.')[-1]
-
-                if not len(superrecovery[model]) == 1:
-                    choices = []
-                    for i in superrecovery[model].keys():
-                        choices.append(noneprompt.Choice(i))
-                    status.stop()
-                    choice = noneprompt.ListPrompt(
-                        '请选择超级恢复版本', choices).prompt()
+            if rainyun:
+                try:
+                    status.update('获取超级恢复列表')
                     status.start()
-                    sr_version = choice.name
-                else:
-                    sr_version = list(superrecovery[model].keys())[0]
+                    logging.info('获取超级恢复列表')
+                    with requests.get(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}superrecovery.json') as r:
+                        superrecovery: dict[str, dict[str, str]] = json.loads(r.content)
 
-                if not os.path.exists(f'data/superrecovery/{model}_{sr_version}/'):
-                    status.stop()
-                    logging.info('下载文件')
-                    tools.download_file(
-                        superrecovery[model][sr_version], 'tmp/superrecovery.zip')
-                    logging.info('解压文件')
-                    status.update('解压文件')
-                    status.start()
-                    if not os.path.exists('data/superrecovery/'):
-                        os.mkdir('data/superrecovery/')
-                    os.mkdir(f'data/superrecovery/{model}_{sr_version}/')
-                    tools.extract_all('tmp/superrecovery.zip',
-                                    f'data/superrecovery/{model}_{sr_version}/')
+                    logging.info('获取成功!')
 
-                if model in ('Z1S', 'Z1y', 'Z2', 'Z3', 'Z5A', 'Z5Pro'):
-                    fh_loader = 'fh_loader.exe'
-                elif model == 'Z6' or model == 'Z5q':
-                    if sr_version == '1.4.6' or sr_version == '3.5.1':
+                    logging.info('尝试自动识别机型')
+                    status.update('获取机型')
+                    if adb.is_connect():
+                        info = adb.get_info()
+                        model = tools.xtc_models[info['innermodel']]
+                        logging.info('获取成功')
+                        status.stop()
+                    else:
+                        logging.info('获取失败,进入手动选择')
+                        status.stop()
+                        choices: list[noneprompt.Choice[None]] = []
+                        for i, x in enumerate(superrecovery.keys()):
+                            choices.append(noneprompt.Choice(f'{i+1}.{x}'))
+                        choice = noneprompt.ListPrompt('请选择你的机型', choices).prompt()
+                        model = choice.name.split('.')[-1]
+
+                    if not len(superrecovery[model]) == 1:
+                        choices = []
+                        for i in superrecovery[model].keys():
+                            choices.append(noneprompt.Choice(i))
+                        status.stop()
+                        choice = noneprompt.ListPrompt(
+                            '请选择超级恢复版本', choices).prompt()
+                        status.start()
+                        sr_version = choice.name
+                    else:
+                        sr_version = list(superrecovery[model].keys())[0]
+
+                    if not os.path.exists(f'data/superrecovery/{model}_{sr_version}/'):
+                        status.stop()
+                        logging.info('下载文件')
+                        tools.download_file(
+                            superrecovery[model][sr_version], 'tmp/superrecovery.zip')
+                        logging.info('解压文件')
+                        status.update('解压文件')
+                        status.start()
+                        if not os.path.exists('data/superrecovery/'):
+                            os.mkdir('data/superrecovery/')
+                        os.mkdir(f'data/superrecovery/{model}_{sr_version}/')
+                        tools.extract_all('tmp/superrecovery.zip',
+                                        f'data/superrecovery/{model}_{sr_version}/')
+
+                    if model in ('Z1S', 'Z1y', 'Z2', 'Z3', 'Z5A', 'Z5Pro'):
                         fh_loader = 'fh_loader.exe'
+                    elif model == 'Z6' or model == 'Z5q':
+                        if sr_version == '1.4.6' or sr_version == '3.5.1':
+                            fh_loader = 'fh_loader.exe'
+                        else:
+                            fh_loader = 'xtcfh_loader.exe'
                     else:
                         fh_loader = 'xtcfh_loader.exe'
-                else:
-                    fh_loader = 'xtcfh_loader.exe'
 
-                sendxml: str = ''
-                sendxml_list: list[str] = []
-                mbn = ''
-                for i in os.listdir(f'data/superrecovery/{model}_{sr_version}/'):
-                    if i[:5] == 'patch' and i[-3:] == 'xml':
-                        sendxml_list.append(i)
-                    elif i[:10] == 'rawprogram' and i[-3:] == 'xml':
-                        sendxml_list.append(i)
-                    if i[:4] == 'prog' and i[-3:] == 'mbn':
-                        mbn = f'data/superrecovery/{model}_{sr_version}/{i}'
+                    sendxml: str = ''
+                    sendxml_list: list[str] = []
+                    mbn = ''
+                    for i in os.listdir(f'data/superrecovery/{model}_{sr_version}/'):
+                        if i[:5] == 'patch' and i[-3:] == 'xml':
+                            sendxml_list.append(i)
+                        elif i[:10] == 'rawprogram' and i[-3:] == 'xml':
+                            sendxml_list.append(i)
+                        if i[:4] == 'prog' and i[-3:] == 'mbn':
+                            mbn = f'data/superrecovery/{model}_{sr_version}/{i}'
 
-                for i in sendxml_list:
-                    sendxml = sendxml + i + ','
-                sendxml = sendxml[:-1]
+                    for i in sendxml_list:
+                        sendxml = sendxml + i + ','
+                    sendxml = sendxml[:-1]
 
-                status.update('等待连接')
-                status.start()
-                logging.info('等待连接')
-                while True:
-                    if adb.is_connect():
-                        adb.reboot(adb.RebootMode.edl)
-                        break
-                    if type(tools.check_edl()) == str:
-                        break
-                port = tools.wait_for_edl()
-                logging.info('连接成功!')
+                    status.update('等待连接')
+                    status.start()
+                    logging.info('等待连接')
+                    while True:
+                        if adb.is_connect():
+                            adb.reboot(adb.RebootMode.edl)
+                            break
+                        if type(tools.check_edl()) == str:
+                            break
+                    port = tools.wait_for_edl()
+                    logging.info('连接成功!')
 
-                qt = tools.QT('bin/QSaharaServer.exe',
-                            f'bin/{fh_loader}', port, mbn)
+                    qt = tools.QT('bin/QSaharaServer.exe',
+                                f'bin/{fh_loader}', port, mbn)
 
-                logging.info('进入sahara模式')
-                status.update('进入sahara模式')
-                try:
-                    qt.intosahara()
-                except qt.QSaharaServerError:
-                    logging.warning('进入sahara模式失败,可能已经进入!尝试直接超恢')
+                    logging.info('进入sahara模式')
+                    status.update('进入sahara模式')
+                    try:
+                        qt.intosahara()
+                    except qt.QSaharaServerError:
+                        logging.warning('进入sahara模式失败,可能已经进入!尝试直接超恢')
 
-                logging.info('开始超恢')
-                logging.info('提示: 此过程耗时较长,请耐心等待')
-                status.update('超级恢复中')
-                qt.fh_loader(rf'--port="\\.\COM{port}" --sendxml={sendxml} --search_path="data/superrecovery/{model}_{sr_version}" --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
-                sleep(0.5)
-                qt.fh_loader(rf'--port="\\.\COM{port}" --setactivepartition="0" --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
-                sleep(0.5)
-                qt.fh_loader(rf'--port="\\.\COM{port}" --reset --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
-                sleep(0.5)
-                qt.exit9008()
-                status.stop()
-                logging.info('超恢成功!')
-                logging.info('提示:若未开机可直接长按电源键开机进入系统')
-                input('超恢成功!按下回车键回到主界面')
-            except tools.RunProgramException:
-                status.stop()
-                tools.logging_traceback('超级恢复失败')
-                tools.print_traceback_error('超级恢复失败')
+                    logging.info('开始超恢')
+                    logging.info('提示: 此过程耗时较长,请耐心等待')
+                    status.update('超级恢复中')
+                    qt.fh_loader(rf'--port="\\.\COM{port}" --sendxml={sendxml} --search_path="data/superrecovery/{model}_{sr_version}" --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
+                    sleep(0.5)
+                    qt.fh_loader(rf'--port="\\.\COM{port}" --setactivepartition="0" --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
+                    sleep(0.5)
+                    qt.fh_loader(rf'--port="\\.\COM{port}" --reset --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
+                    sleep(0.5)
+                    qt.exit9008()
+                    status.stop()
+                    logging.info('超恢成功!')
+                    logging.info('提示:若未开机可直接长按电源键开机进入系统')
+                    input('超恢成功!按下回车键回到主界面')
+                except tools.RunProgramException:
+                    status.stop()
+                    tools.logging_traceback('超级恢复失败')
+                    tools.print_traceback_error('超级恢复失败')
+                    tools.pause()
+                    break
+            else:
+                print('XTCEasyRootPlus 的超级恢复功能已经停止服务')
                 tools.pause()
-                break
-
         case '3.工具箱':
             while True:
                 os.system('cls')
@@ -1406,7 +1412,7 @@ while True:
                                 model = tools.xtc_models[adb.get_innermodel()]
                                 status.stop()
                                 tools.download_file(
-                                    f'https://cn-nb1.rains3.com/xtceasyrootplus/xtcpatch/{model}.zip', 'tmp/xtcpatch.zip')
+                                    f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}xtcpatch/{model}.zip', 'tmp/xtcpatch.zip')
                                 status.update('开始安装')
                                 status.start()
                                 logging.info('开始安装')
@@ -1439,7 +1445,7 @@ while True:
                                 logging.info('开始下载文件')
                                 status.stop()
                                 tools.download_file(
-                                    'https://cn-nb1.rains3.com/xtceasyrootplus/caremeospro.zip', 'tmp/caremeospro.zip')
+                                    f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}caremeospro.zip', 'tmp/caremeospro.zip')
                                 logging.info('开始安装')
                                 logging.info(
                                     '提示:安装CaremeOSPro可能需要耗费较长的时间,请耐心等待')
@@ -1719,7 +1725,10 @@ while True:
 
 特别鸣谢:
     早茶光: 制作了XTCEasyRoot,xtcpatch,810和711的adbd,多个版本的改版桌面,并且为我解答了许多问题,[white]本项目的逻辑基本上是参考[/white][strike](抄)[/strike]的XTCEasyRoot
-    huanli233: 制作了部分改版桌面,notice,systemplus,weichatpro2"""
+    huanli233: 制作了部分改版桌面,notice,systemplus,weichatpro2
+
+
+    """
 
             for i in about.splitlines():
                 print(i)

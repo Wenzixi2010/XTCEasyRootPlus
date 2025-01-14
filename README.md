@@ -1,3 +1,7 @@
+# XTCEasyRootPlus 现在已经停止维护!
+
+### 详情请见 [#5](https://github.com/OnesoftQwQ/XTCEasyRootPlus/issues/5)
+
 # XTCEasyRootPlus
 
 一个使用Python制作的小天才电话手表一键Root程序
