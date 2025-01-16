@@ -331,128 +331,128 @@ while True:
                 input('您似乎没有拔卡!如果不想喜提「手表验证异常」请先拔卡,如已拔卡无视此提示')
 
             if android_version == '7.1':
-                # try:
-                #     status.update('重启设备至9008模式')
-                #     status.start()
-                #     logging.info('重启设备至9008模式')
-                #     adb.reboot(adb.RebootMode.edl)
-                #     logging.info('等待连接')
-                #     port = tools.wait_for_edl()
-                # except adb.ADBError:
-                #     status.stop()
-                #     tools.logging_traceback('重启设备至9008模式失败')
-                #     tools.print_traceback_error('重启设备至9008模式失败')
-                #     tools.pause()
-                #     break
+                try:
+                    status.update('重启设备至9008模式')
+                    status.start()
+                    logging.info('重启设备至9008模式')
+                    adb.reboot(adb.RebootMode.edl)
+                    logging.info('等待连接')
+                    port = tools.wait_for_edl()
+                except adb.ADBError:
+                    status.stop()
+                    tools.logging_traceback('重启设备至9008模式失败')
+                    tools.print_traceback_error('重启设备至9008模式失败')
+                    tools.pause()
+                    break
 
-                # logging.info('连接成功,开始读取boot分区')
-                # status.update('读取boot分区')
-                # qt = tools.QT('bin/QSaharaServer.exe',
-                #               'bin/fh_loader.exe', port, f'data/{model}/mbn.mbn')
-                # try:
-                #     qt.intosahara()
-                #     qt.read_partition('boot')
-                #     logging.info('读取boot分区成功!')
-                #     shutil.copy('boot.img', 'tmp/')
-                #     os.remove('boot.img')
-                # except qt.QSaharaServerError:
-                #     status.stop()
-                #     tools.logging_traceback('进入Sahara模式失败')
-                #     qt.exit9008()
-                #     tools.print_traceback_error('进入Sahara模式失败')
-                #     tools.pause()
-                #     break
-                # except qt.FHLoaderError:
-                #     status.stop()
-                #     tools.logging_traceback('读取boot分区失败')
-                #     qt.exit9008()
-                #     tools.print_traceback_error('读取boot分区失败')
-                #     tools.pause()
-                #     break
+                logging.info('连接成功,开始读取boot分区')
+                status.update('读取boot分区')
+                qt = tools.QT('bin/QSaharaServer.exe',
+                              'bin/fh_loader.exe', port, f'data/{model}/mbn.mbn')
+                try:
+                    qt.intosahara()
+                    qt.read_partition('boot')
+                    logging.info('读取boot分区成功!')
+                    shutil.copy('boot.img', 'tmp/')
+                    os.remove('boot.img')
+                except qt.QSaharaServerError:
+                    status.stop()
+                    tools.logging_traceback('进入Sahara模式失败')
+                    qt.exit9008()
+                    tools.print_traceback_error('进入Sahara模式失败')
+                    tools.pause()
+                    break
+                except qt.FHLoaderError:
+                    status.stop()
+                    tools.logging_traceback('读取boot分区失败')
+                    qt.exit9008()
+                    tools.print_traceback_error('读取boot分区失败')
+                    tools.pause()
+                    break
 
-                # try:
-                #     logging.info('开始修补boot分区')
-                #     status.update('修补boot分区')
-                #     tools.patch_boot('bin/magiskboot.exe',
-                #                      'tmp/boot.img', 'bin/20400.zip', 'tmp/')
-                #     logging.info('修补完毕')
-                # except tools.MAGISKBOOT.MagiskBootError:
-                #     status.stop()
-                #     tools.logging_traceback('修补boot分区失败')
-                #     qt.exit9008()
-                #     tools.print_traceback_error('修补boot分区失败')
-                #     tools.pause()
-                #     break
+                try:
+                    logging.info('开始修补boot分区')
+                    status.update('修补boot分区')
+                    tools.patch_boot('bin/magiskboot.exe',
+                                     'tmp/boot.img', 'bin/20400.zip', 'tmp/')
+                    logging.info('修补完毕')
+                except tools.MAGISKBOOT.MagiskBootError:
+                    status.stop()
+                    tools.logging_traceback('修补boot分区失败')
+                    qt.exit9008()
+                    tools.print_traceback_error('修补boot分区失败')
+                    tools.pause()
+                    break
 
-                # try:
-                #     if mode == 'boot':
-                #         logging.info('重新刷入boot')
-                #         status.update('刷入boot')
-                #         qt.write_partition('tmp/boot_new.img', 'boot')
+                try:
+                    if mode == 'boot':
+                        logging.info('重新刷入boot')
+                        status.update('刷入boot')
+                        qt.write_partition('tmp/boot_new.img', 'boot')
 
-                #     elif mode == 'recovery':
-                #         logging.info('刷入recovery')
-                #         status.update('刷入recovery')
-                #         qt.write_partition('tmp/boot_new.img', 'recovery')
+                    elif mode == 'recovery':
+                        logging.info('刷入recovery')
+                        status.update('刷入recovery')
+                        qt.write_partition('tmp/boot_new.img', 'recovery')
 
-                #         logging.info('刷入misc')
-                #         status.update('刷入misc')
-                #         qt.write_partition(f'data/{model}/misc.mbn', 'misc')
-                # except qt.FHLoaderError:
-                #     status.stop()
-                #     tools.logging_traceback(f'刷入{mode}分区失败')
-                #     qt.exit9008()
-                #     tools.print_traceback_error(f'刷入{mode}分区失败')
-                #     tools.pause()
-                #     break
+                        logging.info('刷入misc')
+                        status.update('刷入misc')
+                        qt.write_partition(f'data/{model}/misc.mbn', 'misc')
+                except qt.FHLoaderError:
+                    status.stop()
+                    tools.logging_traceback(f'刷入{mode}分区失败')
+                    qt.exit9008()
+                    tools.print_traceback_error(f'刷入{mode}分区失败')
+                    tools.pause()
+                    break
 
-                # try:
-                #     logging.info('刷入成功,退出9008模式')
-                #     status.update('退出9008')
-                #     qt.exit9008()
-                # except qt.FHLoaderError:
-                #     status.stop()
-                #     tools.logging_traceback('退出9008模式失败')
-                #     tools.print_traceback_error('退出9008模式失败')
-                #     tools.pause()
-                #     break
+                try:
+                    logging.info('刷入成功,退出9008模式')
+                    status.update('退出9008')
+                    qt.exit9008()
+                except qt.FHLoaderError:
+                    status.stop()
+                    tools.logging_traceback('退出9008模式失败')
+                    tools.print_traceback_error('退出9008模式失败')
+                    tools.pause()
+                    break
 
                 logging.info('等待重新连接')
                 status.update('等待重新连接')
                 adb.wait_for_connect()
                 adb.wait_for_complete()
 
-                # try:
-                #     logging.info('安装Magisk管理器')
-                #     status.update('安装Magisk管理器')
-                #     adb.install(f'data/{model}/manager.apk')
-                # except adb.ADBError:
-                #     status.stop()
-                #     tools.logging_traceback('安装Magisk管理器失败')
-                #     tools.print_traceback_error('安装Magisk管理器失败')
-                #     tools.pause()
-                #     break
+                try:
+                    logging.info('安装Magisk管理器')
+                    status.update('安装Magisk管理器')
+                    adb.install(f'data/{model}/manager.apk')
+                except adb.ADBError:
+                    status.stop()
+                    tools.logging_traceback('安装Magisk管理器失败')
+                    tools.print_traceback_error('安装Magisk管理器失败')
+                    tools.pause()
+                    break
 
-                # try:
-                #     logging.info('启动管理器')
-                #     status.update('启动管理器')
-                #     sleep(5)
-                #     adb.shell('am start com.topjohnwu.magisk/a.c')
-                #     adb.push(f'data/{model}/xtcpatch', '/sdcard/')
-                #     adb.push(f'data/{model}/magiskfile', '/sdcard/')
-                #     adb.push('bin/2100.sh', '/sdcard/')
-                #     logging.info('刷入模块')
-                #     status.update('刷入模块')
-                #     adb.shell('su -c sh /sdcard/2100.sh')
-                #     adb.install_module('bin/xtcpatch2100.zip')
-                #     adb.shell(
-                #         'rm -rf /sdcard/xtcpatch /sdcard/magiskfile /sdcard/2100.sh')
-                # except adb.ADBError:
-                #     status.stop()
-                #     tools.logging_traceback('刷入模块失败')
-                #     tools.print_traceback_error('刷入模块失败')
-                #     tools.pause()
-                #     break
+                try:
+                    logging.info('启动管理器')
+                    status.update('启动管理器')
+                    sleep(5)
+                    adb.shell('am start com.topjohnwu.magisk/a.c')
+                    adb.push(f'data/{model}/xtcpatch', '/sdcard/')
+                    adb.push(f'data/{model}/magiskfile', '/sdcard/')
+                    adb.push('bin/2100.sh', '/sdcard/')
+                    logging.info('刷入模块')
+                    status.update('刷入模块')
+                    adb.shell('su -c sh /sdcard/2100.sh')
+                    adb.install_module('bin/xtcpatch2100.zip')
+                    adb.shell(
+                        'rm -rf /sdcard/xtcpatch /sdcard/magiskfile /sdcard/2100.sh')
+                except adb.ADBError:
+                    status.stop()
+                    tools.logging_traceback('刷入模块失败')
+                    tools.print_traceback_error('刷入模块失败')
+                    tools.pause()
+                    break
 
                 if download_thread.is_alive():
                     logging.info('下载文件')
