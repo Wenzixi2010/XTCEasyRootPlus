@@ -41,13 +41,15 @@ def run_wait(args: str) -> ReturnMessageSegments:
     运行一个程序并等待
     """
     logging.debug(f'运行程序{args}')
-    p = subprocess.run(args, stdout=subprocess.PIPE,
-                       stderr=subprocess.STDOUT, text=False)
+    p = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=False)
     stdout: str | bytes = ''
     try:
-        stdout = p.stdout.decode()
+        stdout = p.stdout.decode('gbk')
     except UnicodeDecodeError:
-        stdout = p.stdout
+        try:
+            stdout = p.stdout.decode()
+        except UnicodeDecodeError:
+            stdout = p.stdout
     logging.debug(LoggingDebugRunningProgramReturn(
         (args, get_return_message_segments(p.returncode == 0, stdout))))
     return get_return_message_segments(p.returncode == 0, stdout)
@@ -196,9 +198,9 @@ class ADB:
     def install(self, path: str, args: list[str] = ['r', 't', 'd']) -> str:
         argsstr = ''
         for i in args:
-            argsstr = argsstr + '' + '-' + i
+            argsstr = argsstr + '-' + i + ' '
         logging.debug(f'安装应用{path}, 参数:{args}')
-        return self.adb(f'install {path}{argsstr}')
+        return self.adb(f'install {argsstr}{path}')
 
     def loop_install(self, path: str, args: list[str] = ['r', 't', 'd'], sleeptime: int | float = 2) -> None:
         """
@@ -389,7 +391,7 @@ class QT:
 
     def intosahara(self) -> str:
         try:
-            return self.qsaharaserver(f'{self.qsspath} -u {str(self.port)} -s 13:"{self.mbn}"')
+            return self.qsaharaserver(f'-u {str(self.port)} -s 13:"{self.mbn}"')
         except self.QSaharaServerError as e:
             logging_traceback('进入Sahara模式失败')
             raise self.QSaharaServerError(e)
@@ -419,12 +421,14 @@ class QT:
         logging.debug('读取分区列表')
         try:
             self.fh_loader(
-                rf'--port="\\.\COM{self.port}" --search_path="tmp/" --convertprogram2read --sendimage="fh_gpt_header_0" --start_sector="1" --lun="0" --num_sectors="1" --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
+                rf'--port="\\.\COM{self.port}" --search_path="tmp/" --convertprogram2read --sendimage="fh_gpt_header_0" --start_sector="1" --lun="0" --num_sectors="1" --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc"" --num_sectors=200 --sectorsizeinbytes=512')
             self.fh_loader(
-                rf'--port="\\.\COM{self.port}" --search_path="tmp/" --convertprogram2read --sendimage="fh_gpt_entries_0" --start_sector="2" --lun="0" --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
+                rf'--port="\\.\COM{self.port}" --search_path="tmp/" --convertprogram2read --sendimage="fh_gpt_entries_0" --start_sector="2" --lun="0" --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc"" --num_sectors=200 --sectorsizeinbytes=512')
         except self.FHLoaderError as e:
             logging_traceback('读取分区列表失败')
             raise self.FHLoaderError(e)
+        shutil.move('fh_gpt_header_0', 'tmp/')
+        shutil.move('fh_gpt_entries_0', 'tmp/')
         self.partition_list = get_partition_list_from_files(
             'tmp/fh_gpt_entries_0', 'tmp/fh_gpt_header_0')[1]
         return self.partition_list
@@ -455,8 +459,7 @@ class QT:
             """<?xml version="1.0" ?>
 <data>
   <program SECTOR_SIZE_IN_BYTES="512" file_sector_offset="0" filename="__name__.img" label="__name__" num_partition_sectors="__size__" physical_partition_number="0" size_in_KB="__size_kb__" sparse="false" start_byte_hex="__start_hex__" start_sector="__start__" />
-</data>
-"""
+</data>"""
         if start is None or size is None:
             if self.partition_list is None:
                 self.get_partition_list()
@@ -810,20 +813,26 @@ SHA1={sha1}""")
 
     # 修补dtb
     logging.info('修补dtb')
-    magiskboot('dtb kernel_dtb patch')
+    try:
+        magiskboot('dtb kernel_dtb patch')
+    except MAGISKBOOT.MagiskBootError:
+        logging.debug('修补dtb失败')
 
     # 修补kernel
     logging.info('修补kernel')
-    magiskboot('hexpatch kernel 49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054')  # 尝试修补kernel-移除三星RKP
-    magiskboot('hexpatch kernel 821B8012 E2FF8F12')  # 尝试修补kernel-移除三星defex
-    if options['rootfs']:
-        # 尝试修补kernel-强制开启rootfs
-        magiskboot(
-            'hexpatch kernel 736B69705F696E697472616D667300 77616E745F696E697472616D667300')
-    else:
-        # 尝试修补kernel-关闭rootfs
-        magiskboot(
-            'hexpatch kernel 77616E745F696E697472616D667300 736B69705F696E697472616D667300')
+    try:
+        magiskboot('hexpatch kernel 49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054')  # 尝试修补kernel-移除三星RKP
+        magiskboot('hexpatch kernel 821B8012 E2FF8F12')  # 尝试修补kernel-移除三星defex
+        if options['rootfs']:
+            # 尝试修补kernel-强制开启rootfs
+            magiskboot(
+                'hexpatch kernel 736B69705F696E697472616D667300 77616E745F696E697472616D667300')
+        else:
+            # 尝试修补kernel-关闭rootfs
+            magiskboot(
+                'hexpatch kernel 77616E745F696E697472616D667300 736B69705F696E697472616D667300')
+    except MAGISKBOOT.MagiskBootError:
+        logging.debug('修补kernel失败')
 
     patch()
 
