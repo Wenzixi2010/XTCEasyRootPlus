@@ -264,11 +264,13 @@ while True:
             
             doze: bool = True
             if android_version == '8.1':
+                status.stop()
                 choice = noneprompt.ConfirmPrompt('是否要需要禁用模式切换').prompt()
                 launcher = launcher[:-4]+('_A' if choice else '_B')+launcher[-4:]
                 if launcher[0:2] == '12':
                     choice = noneprompt.ConfirmPrompt('12版本桌面较为耗电,是否刷入Doze模块尝试优化耗电?').prompt()
                     doze = choice
+                status.start()
 
             status.stop()
 
@@ -985,7 +987,7 @@ while True:
 
                 status.stop()
                 console.rule('接下来需要你进行一些手动操作', characters='=')
-                input('请滑到界面底部点击"自激活",依次点击"激活SystemPlus"和"激活核心破解"按钮,完成后按下回车继续')
+                input('请打开"SystemPlus"应用,滑到界面底部点击"自激活",依次点击"激活SystemPlus"和"激活核心破解"按钮,完成后按下回车继续')
                 console.rule('', characters='=')
                 status.start()
 
