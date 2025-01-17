@@ -1292,8 +1292,6 @@ while True:
                     sleep(0.5)
                     qt.fh_loader(rf'--port="\\.\COM{port}" --setactivepartition="0" --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
                     sleep(0.5)
-                    qt.fh_loader(rf'--port="\\.\COM{port}" --reset --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
-                    sleep(0.5)
                     qt.exit9008()
                     status.stop()
                     logging.info('超恢成功!')

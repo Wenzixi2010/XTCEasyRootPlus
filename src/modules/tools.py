@@ -401,7 +401,7 @@ class QT:
         self.intosahara()
 
     def exit9008(self) -> str:
-        return self.fh_loader(rf'--port="\\.\COM{self.port}" --sendxml="ResetToEDL.xml" --search_path="bin/" --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
+        return self.fh_loader(rf'--port="\\.\COM{self.port}" --reset --noprompt --showpercentagecomplete --zlpawarehost="1" --memoryname=""emmc""')
 
     def load_xml(self, xml_path: str, memory: str = 'EMMC') -> str:
         return self.fh_loader(rf'--port="\\.\COM{self.port}" --memoryname="{memory}" --sendxml="{xml_path}" --convertprogram2read --noprompt')
