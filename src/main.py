@@ -18,7 +18,7 @@ from tkinter import filedialog
 from modules import logging
 # import traceback
 
-version: list[int | Literal['b']] = [2, 1]
+version: list[int | Literal['b']] = [2, 2, 'b', 1]
 
 if not os.path.exists('logs/'):
     os.mkdir('logs')
