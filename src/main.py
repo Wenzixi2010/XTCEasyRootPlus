@@ -18,7 +18,7 @@ from tkinter import filedialog
 from modules import logging
 # import traceback
 
-version: list[int | Literal['b']] = [2, 2, 'b', 1]
+version: list[int | Literal['b']] = [2, 2, 'b', 2]
 
 if not os.path.exists('logs/'):
     os.mkdir('logs')
@@ -1166,6 +1166,17 @@ while True:
                             break
                         sleep(1)
                     adb.shell('am start -a android.intent.action.VIEW -d file:///sdcard/notice.apk -t application/vnd.android.package-archive')
+                    sleep(1)
+                    if not adb.is_connect:
+                        adb.wait_for_connect()
+                        adb.wait_for_complete()
+                        while True:
+                            if not adb.is_screen_alive():
+                                adb.shell('input keyevent 26')
+                                sleep(1)
+                            if 'com.xtc.i3launcher' in adb.get_activity():
+                                break
+                        adb.shell('am start -a android.intent.action.VIEW -d file:///sdcard/notice.apk -t application/vnd.android.package-archive')
                 except adb.ADBError:
                     status.stop()
                     tools.logging_traceback('设置弦-安装器失败')
