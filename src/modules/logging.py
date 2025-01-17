@@ -28,9 +28,13 @@ class Logger:
             stack_str: str = ''
             for i in stack[:-3]:
                 stack_str += f'[{os.path.basename(i[1]).replace('.py', '')}/{i[2] if i[3] == '<module>' else i[3]}]'
-            with open(self.filename, 'a') as f:
+            with open(self.filename, 'ab') as f:
                 write = f'[{time.strftime("%Y_%m_%d_%H-%M-%S", time.localtime())}][{level.name.upper()}]{stack_str}{msg}\n'
-                f.write(write)
+                try:
+                    bwrite = write.encode('gbk')
+                except UnicodeEncodeError:
+                    bwrite = write.encode()
+                f.write(bwrite)
 
     def _print_log(self, level: level, *args: Any):
         if len(args) == 1:
