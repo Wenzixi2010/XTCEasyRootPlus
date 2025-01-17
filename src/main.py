@@ -1430,7 +1430,7 @@ while True:
                                 model = tools.xtc_models[adb.get_innermodel()]
                                 status.stop()
                                 tools.download_file(
-                                    f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}xtcpatch/{model}.zip', 'tmp/xtcpatch.zip')
+                                    f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}xtcpatch.zip', 'tmp/xtcpatch.zip')
                                 status.update('开始安装')
                                 status.start()
                                 logging.info('开始安装')
