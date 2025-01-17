@@ -989,13 +989,10 @@ while True:
                 try:
                     status.update('启动SystemPlus')
                     logging.info('启动SystemPlus')
-                    while True:
-                        if not adb.is_screen_alive():
-                            adb.shell('input keyevent 26')
-                            sleep(1)
-                        if 'com.xtc.i3launcher' in adb.get_activity():
-                            break
+                    if not adb.is_screen_alive():
+                        adb.shell('input keyevent 26')
                         sleep(1)
+                        break
                     adb.shell('am start -n com.huanli233.systemplus/.ActiveSelfActivity')
                 except adb.ADBError:
                     status.stop()
