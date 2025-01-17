@@ -64,7 +64,7 @@ class Logger:
         if len(args) == 1:
             args = args[0]
         self._print_log(level.error, args)
-        self._write_file(level.warning, args)
+        self._write_file(level.error, args)
 
 logger = None
 
