@@ -42,6 +42,7 @@ def global_exception_handler(exc_type: Type[BaseException], exc_value: BaseExcep
     exc_traceback_str = '全局错误\n' + \
         ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
     logging.error(exc_traceback_str)
+    tools.pause()
 
 sys.excepthook = global_exception_handler
 
@@ -985,9 +986,27 @@ while True:
                     tools.pause()
                     break
 
+                try:
+                    status.update('启动SystemPlus')
+                    logging.info('启动SystemPlus')
+                    while True:
+                        if not adb.is_screen_alive():
+                            adb.shell('input keyevent 26')
+                            sleep(1)
+                        if 'com.xtc.i3launcher' in adb.get_activity():
+                            break
+                        sleep(1)
+                    adb.shell('am start -n com.huanli233.systemplus/.ActiveSelfActivity')
+                except adb.ADBError:
+                    status.stop()
+                    tools.logging_traceback('启动SystemPlus失败')
+                    tools.print_traceback_error('启动SystemPlus失败')
+                    tools.pause()
+                    break
+
                 status.stop()
                 console.rule('接下来需要你进行一些手动操作', characters='=')
-                input('请打开"SystemPlus"应用,滑到界面底部点击"自激活",依次点击"激活SystemPlus"和"激活核心破解"按钮,完成后按下回车继续')
+                input('请滑到界面底部点击"自激活",依次点击"激活SystemPlus"和"激活核心破解"按钮,完成后按下回车继续')
                 console.rule('', characters='=')
                 status.start()
 
