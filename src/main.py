@@ -18,7 +18,7 @@ from tkinter import filedialog
 from modules import logging
 # import traceback
 
-version: list[int | Literal['b']] = [2, 2, 'b', 2]
+version: list[int | Literal['b']] = [2, 2, 'b', 3]
 
 if not os.path.exists('logs/'):
     os.mkdir('logs')
@@ -1353,6 +1353,7 @@ while True:
                         noneprompt.Choice('8.进入qmmi模式'),
                         noneprompt.Choice('9.设置微信QQ开机自启动'),
                         noneprompt.Choice('10.启动投屏'),
+                        noneprompt.Choice('11.设置弦-安装器'),
                     ],
                     default_select=2
                 ).prompt().name:
@@ -1735,6 +1736,28 @@ while True:
                             'bin/scrcpy.exe', stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
                         logging.info('执行成功!')
                         input('按回车返回工具箱界面')
+                    case '11.设置弦-安装器':
+                        status = console.status('')
+                        status.start()
+                        status.update('等待连接')
+                        logging.info('设置弦-安装器')
+                        adb.wait_for_connect()
+                        adb.wait_for_complete()
+                        logging.info('设置弦-安装器')
+                        status.update('设置弦-安装器')
+                        if not adb.is_screen_alive():
+                            adb.shell('input keyevent 26')
+                            sleep(1)
+                        adb.shell('am start -a android.intent.action.VIEW -d file:///sdcard/notice.apk -t application/vnd.android.package-archive')
+                        
+                        status.stop()
+                        console.rule('接下来需要你对手表进行一些手动操作', characters='=')
+                        print('现在你的手表上出现了一个白色的"打开方式"对话框,请往下滑选择"使用弦安装器"并点击始终按钮;点击始终按钮后会弹出安装notice的对话框,点击取消即可')
+                        input('如果你已经进入主界面,请按回车继续')
+                        console.rule('', characters='=')
+                        print('\n设置弦-安装器成功!')
+
+                        tools.pause('按下回车键返回工具箱界面......')
                     case _:
                         pass
 
