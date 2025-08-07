@@ -16,9 +16,8 @@ import shutil
 import threading
 from tkinter import filedialog
 from modules import logging
-# import traceback
 
-version: list[int | Literal['b']] = [2, 2, 'b', 3]
+version: list[int | Literal['b']] = [2, 6]
 
 if not os.path.exists('logs/'):
     os.mkdir('logs')
@@ -59,7 +58,9 @@ if not os.path.exists('data/'):
     os.mkdir('data')
 
 if debug:
+    print('[blue][*]下载镜像源By | Zxi2233[/blue]')
     print('[red][!][/red]警告:这是一个测试版本,非常不稳定,若非测试人员请勿使用!')
+    print('[red][!][/red]本版本基于开源项目[https://github.com/OnesoftQwQ/XTCEasyRootPlus]')
     sleep(5)
 
 # 检查更新
@@ -68,9 +69,9 @@ status.update('正在检查更新')
 status.start()
 logging.debug(f'当前版本:{version[0]}.{version[1]}')
 logging.info('检查最新版本')
-rainyun = requests.get('https://cn-nb1.rains3.com/xtceasyrootplus/version.json').status_code == 200
+ZxiShare = requests.get('https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/version.json').status_code == 200
 try:  # 尝试获取版本文件
-    with requests.get(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}version.json') as r:  # 获取版本信息
+    with requests.get(f"{('https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/')}version.json") as r:  # 获取版本信息
         read = r.content
         try:
             read = json.loads(read)
@@ -86,7 +87,7 @@ try:  # 尝试获取版本文件
         logging.info('开始下载新版本......')
         status.stop()
         tools.download_file(
-            f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}XTCEasyRootPlusInstaller.exe', 'tmp/XTCEasyRootPlusInstaller.exe')
+            f"{('https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/')}XTCEasyRootPlusInstaller.exe", 'tmp/XTCEasyRootPlusInstaller.exe')
         subprocess.Popen('tmp/XTCEasyRootPlusInstaller.exe')
         sys.exit()
 except requests.ConnectionError as e:  # 捕捉下载失败错误
@@ -118,18 +119,27 @@ while True:
 
     # 主菜单
     tools.print_logo(version)
-    print(f'\nXTCEasyRootPlus [blue]v{version[0]}.{version[1]}{' beta' if debug else ''}{f' {version[3]}' if debug else ''}[/blue]')
+    print(f"\nXTCEasyRootPlus [blue]v{version[0]}.{version[1]}{' beta' if debug else ''}{' ' + version[3] if debug else ''}[/blue]")
+    notice = requests.get("https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/notice.txt")
+    if notice.status_code == 200:
+        notice = notice.text
+        print(notice)
+    else:
+        print('[red]公告获取失败！[/red]')
+    # print('[#01BFEE]下载镜像源 | Zxi2233[/#01BFEE]')
+    # print('[green]SkyiMoo 343516728[/green]')
+    # print('[green]SourXe 590196390[/green]')
     print('本软件是[green]免费公开使用[/green]的，如果你是付费买来的请马上退款，你被骗了！\n')
-    print('[red]XTCEasyRootPlus 已经停止维护! 因继续使用 XTCEasyRootPlus 导致的任何问题我们概不负责![/red]')
-    print('[red]详情请见 https://github.com/OnesoftQwQ/XTCEasyRootPlus/issues/5[/red]\n')
     logging.debug('进入主菜单')
     choice = noneprompt.ListPrompt(
         '请选择功能',
         [
             noneprompt.Choice('1.一键Root'),
-            noneprompt.Choice('2.超级恢复(救砖/降级/恢复原版系统)'),
-            noneprompt.Choice('3.工具箱'),
-            noneprompt.Choice('4.关于')
+            noneprompt.Choice('2.超级恢复(救砖/降级/恢复原版系统)[复活啦！]'),
+            noneprompt.Choice('3.安装本地应用安装包(APK)'),
+            noneprompt.Choice('4.安装模块'),
+            noneprompt.Choice('5.工具箱'),
+            noneprompt.Choice('6.关于')
         ]
     ).prompt().name
     logging.debug(f'选择:{choice}')
@@ -192,21 +202,21 @@ while True:
                 is_v3_encrypt = tools.is_v3_encrypt(model, info['version_of_system'])
                 logging.debug(f'是否为V3加密版本: {'是' if is_v3_encrypt else '不是'}')
                 """
-                logging.debug(f'是否为V3: {'是' if is_v3 else '不是'}')
-                logging.debug(f'是否是孤儿机型: {'是' if model in ('Z7A', 'Z6_DFB') else '不是'}')
+            logging.debug(f"是否为V3: {'是' if is_v3 else '不是'}")
+            logging.debug(f"是否是孤儿机型: {'是' if model in ('Z7A', 'Z6_DFB') else '不是'}")
 
             if android_version == '8.1':
                 logging.debug('选择Magisk版本')
                 choice = noneprompt.ListPrompt(
                     '请选择想要的Magisk版本',
                     choices=[
-                        noneprompt.Choice('1.Magisk25200'),
-                        noneprompt.Choice('2.MagiskDelta25210')
+                        noneprompt.Choice('1.Magisk25200[选我!]'),
+                        noneprompt.Choice('2.MagiskDelta25210[选我!]')
                     ],
                 ).prompt()
-                if choice.name == '1.Magisk25200':
+                if choice.name == '1.Magisk25200[选我!]':
                     magisk = '25200'
-                elif choice.name == '2.MagiskDelta25210':
+                elif choice.name == '2.MagiskDelta25210[选我!]':
                     magisk = '25210'
                 else:
                     magisk = ''
@@ -218,7 +228,7 @@ while True:
                 logging.info('下载文件')
                 status.update('下载文件')
                 tools.download_file(
-                    f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}{model}.zip', f'tmp/{model}.zip')
+                    f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}{model}.zip", f"tmp/{model}.zip")
 
                 logging.info('解压文件')
                 status.update('解压文件')
@@ -228,14 +238,14 @@ while True:
                 logging.info('下载userdata')
                 if magisk == '25200':
                     tools.download_file(
-                        f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}1userdata.img', 'tmp/userdata.img')
+                        f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}1userdata.img", 'tmp/userdata.img')
                 elif magisk == '25210':
                     tools.download_file(
-                        f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}2userdata.img', 'tmp/userdata.img')
+                        f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}2userdata.img", 'tmp/userdata.img')
 
             if android_version == '7.1' or not is_v3: # type: ignore
                 logging.debug('获取桌面版本列表')
-                with requests.get(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}launchers.json') as r:
+                with requests.get(f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}launchers.json") as r:
                     read = r.content
                     try:
                         if android_version == '7.1':
@@ -277,17 +287,17 @@ while True:
 
             def download_all_files():
                 if android_version == '7.1':
-                    filelist = ['appstore.apk', 'moyeinstaller.apk', 'xtctoolbox.apk','filemanager.apk', 'notice.apk', 'toolkit.apk', launcher, 'xws.apk', 'wxzf.apk']
+                    filelist = ['appstore.apk', 'moyeinstaller.apk', 'xtctoolbox.apk','filemanager.apk', 'notice.apk', 'toolkit.apk', launcher, 'wxzf.apk']
                     for i in filelist:
                         tools.download_file(
-                            f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}apps/{i}', f'tmp/{i}', progress_enable=False)
+                            f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}apps/{i}", f"tmp/{i}", progress_enable=False)
                 elif android_version == '8.1':
-                    filelist = ['appstore.apk', 'notice.apk', 'wxzf.apk', 'wcp2.apk', 'datacenter.apk','xws.apk', launcher, 'filemanager.apk', 'settings.apk', 'systemplus.apk', 'moyeinstaller.apk']
+                    filelist = ['appstore.apk', 'notice.apk', 'wxzf.apk', 'wcp2.apk', 'datacenter.apk', launcher, 'filemanager.apk', 'settings.apk', 'systemplus.apk', 'moyeinstaller.apk']
                     for i in filelist:
-                        tools.download_file(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}apps/{i}', f'tmp/{i}', progress_enable=False)
-                    tools.download_file(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}xtcpatch.zip', 'tmp/xtcpatch.zip', progress_enable=False)
+                        tools.download_file(f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}apps/{i}", f"tmp/{i}", progress_enable=False)
+                    tools.download_file(f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}xtcpatch.zip", 'tmp/xtcpatch.zip', progress_enable=False)
                     if doze:
-                        tools.download_file(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}doze.zip', 'tmp/doze.zip', progress_enable=False)
+                        tools.download_file(f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}doze.zip", 'tmp/doze.zip', progress_enable=False)
 
             download_thread = threading.Thread(target=download_all_files)
             download_thread.start()
@@ -326,10 +336,10 @@ while True:
             output = adb.shell('getprop gsm.xtcplmn.plmnstatus')
             if '没有服务' in output:
                 status.stop()
-                input('手表状态:无服务,请确定您已拔卡!如果不想喜提「手表验证异常」请先拔卡,如已拔卡无视此提示')
+                input('手表状态:无服务,请确定您已拔卡!如果不想喜提「验证异常」请先拔卡,如已拔卡无视此提示')
             elif '只能拨打紧急电话' in output:
                 status.stop()
-                input('您似乎没有拔卡!如果不想喜提「手表验证异常」请先拔卡,如已拔卡无视此提示')
+                input('您似乎没有拔卡!如果不想喜提「验证异常」请先拔卡,如已拔卡无视此提示')
 
             if android_version == '7.1':
                 try:
@@ -699,8 +709,8 @@ while True:
                             break
 
                 status.stop()
-                # logging.info('恭喜你,你的手表ROOT完毕!')
-                input('恭喜你,Root成功!按回车返回主界面')
+                print('[green]-跨越山海 终见曙光-')
+                input('Root完成!按回车返回主界面')
 
             elif android_version == '8.1':
                 status.update('等待连接')
@@ -1097,7 +1107,7 @@ while True:
                     status.update('安装必备应用')
                     adb.shell('wm density 320')
                     adb.shell('pm clear com.android.packageinstaller')
-                    for i in ['appstore.apk', 'notice.apk', 'wxzf.apk', 'wcp2.apk', 'datacenter.apk','xws.apk', 'filemanager.apk', 'settings.apk', 'moyeinstaller.apk']:
+                    for i in ['appstore.apk', 'notice.apk', 'wxzf.apk', 'wcp2.apk', 'datacenter.apk', 'filemanager.apk', 'settings.apk', 'moyeinstaller.apk']:
                         logging.info(f'安装{i}')
                         adb.install(f'tmp/{i}')
                 except adb.ADBError:
@@ -1210,15 +1220,16 @@ while True:
 
                 logging.info('连接成功!')
                 status.stop()
-                input('恭喜你,Root成功!按回车返回主界面')
+                print('[green]-跨越山海 终见曙光-')
+                input('Root完成!按回车返回主界面')
 
-        case '2.超级恢复(救砖/降级/恢复原版系统)':
-            if rainyun:
+        case '2.超级恢复(救砖/降级/恢复原版系统)[复活啦！]':
+            if ZxiShare:
                 try:
                     status.update('获取超级恢复列表')
                     status.start()
                     logging.info('获取超级恢复列表')
-                    with requests.get(f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}superrecovery.json') as r:
+                    with requests.get(f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}superrecovery.json") as r:
                         superrecovery: dict[str, dict[str, str]] = json.loads(r.content)
 
                     logging.info('获取成功!')
@@ -1235,7 +1246,7 @@ while True:
                         status.stop()
                         choices: list[noneprompt.Choice[None]] = []
                         for i, x in enumerate(superrecovery.keys()):
-                            choices.append(noneprompt.Choice(f'{i+1}.{x}'))
+                            choices.append(noneprompt.Choice(f"{i+1}.{x}"))
                         choice = noneprompt.ListPrompt('请选择你的机型', choices).prompt()
                         model = choice.name.split('.')[-1]
 
@@ -1333,7 +1344,64 @@ while True:
             else:
                 print('XTCEasyRootPlus 的超级恢复功能已经停止服务')
                 tools.pause()
-        case '3.工具箱':
+
+        case '3.安装本地应用安装包(APK)':
+            apk = filedialog.askopenfilenames(
+                title='请选择安装包', filetypes=[('安卓应用程序安装包', '*.apk')])
+            if not apk:
+                print('[red]未选择安装包文件！[/red]')
+                input('按回车回到主界面')
+            else:
+                if not adb.is_connect():
+                    status.update('等待连接')
+                    logging.info('等待连接')
+                    status.start()
+                    adb.wait_for_connect()
+                    adb.wait_for_complete()
+                status.update('开始安装')
+                status.start()
+                logging.info('开始安装')
+                for i in apk:
+                    logging.info(f'安装{i.split('/')[-1]}')
+                    output = adb.install(i)
+                    if output == 'success':
+                        logging.info('安装成功!')
+                    else:
+                        status.stop()
+                        tools.print_error(
+                            f'安装{i.split('/')[-1]}失败', output)
+                        input()
+                        status.start()
+                status.stop()
+                input('安装完毕!按回车返回主界面')
+
+        case '4.安装模块':
+            modules = filedialog.askopenfilenames(
+                title='请选择模块', filetypes=[('模块压缩包', '*.zip')])
+            if not modules:
+                print('[red]未选择压缩包文件！[/red]')
+                input('按回车回到主界面')
+            else:
+                if not adb.is_connect():
+                    status.update('等待连接')
+                    logging.info('等待连接')
+                    status.start()
+                    adb.wait_for_connect()
+                    adb.wait_for_complete()
+                status.update('开始安装')
+                status.start()
+                logging.info('开始安装')
+                android_version = adb.get_version_of_android_from_sdk()
+                for i in modules:
+                    logging.info(f'安装{i.split('/')[-1]}')
+                    if android_version == '7.1':
+                        adb.install_module(i)
+                    else:
+                        adb.install_module_new(i)
+                status.stop()
+                input('安装完毕!按回车返回主界面')
+
+        case '5.工具箱':
             while True:
                 os.system('cls')
                 tools.print_logo(version)
@@ -1343,73 +1411,22 @@ while True:
                     '请选择功能',
                     [
                         noneprompt.Choice('q.退出'),
-                        noneprompt.Choice('1.安装本地应用安装包(APK)'),
-                        noneprompt.Choice('2.安装模块'),
-                        noneprompt.Choice('3.安装XTCPatch'),
-                        noneprompt.Choice('4.安装CaremeOS Pro'),
-                        noneprompt.Choice('5.模拟未充电'),
-                        noneprompt.Choice('6.刷入自定义固件'),
-                        noneprompt.Choice('7.分区管理器'),
-                        noneprompt.Choice('8.进入qmmi模式'),
-                        noneprompt.Choice('9.设置微信QQ开机自启动'),
-                        noneprompt.Choice('10.启动投屏'),
-                        noneprompt.Choice('11.设置弦-安装器'),
+                        noneprompt.Choice('1.安装XTCPatch'),
+                        noneprompt.Choice('2.安装CaremeOS Pro'),
+                        noneprompt.Choice('3.模拟未充电'),
+                        noneprompt.Choice('4.刷入自定义固件'),
+                        noneprompt.Choice('5.分区管理器'),
+                        noneprompt.Choice('6.进入qmmi模式'),
+                        noneprompt.Choice('7.设置微信QQ开机自启动'),
+                        noneprompt.Choice('8.启动投屏'),
+                        noneprompt.Choice('9.设置弦-安装器')
                     ],
                     default_select=2
                 ).prompt().name:
 
                     case 'q.退出':
                         break
-
-                    case '1.安装本地应用安装包(APK)':
-                        apk = filedialog.askopenfilenames(
-                            title='请选择安装包', filetypes=[('安卓应用程序安装包', '*.apk')])
-                        if not adb.is_connect():
-                            status.update('等待连接')
-                            logging.info('等待连接')
-                            status.start()
-                            adb.wait_for_connect()
-                            adb.wait_for_complete()
-                        status.update('开始安装')
-                        status.start()
-                        logging.info('开始安装')
-                        for i in apk:
-                            logging.info(f'安装{i.split('/')[-1]}')
-                            output = adb.install(i)
-                            if output == 'success':
-                                logging.info('安装成功!')
-                            else:
-                                status.stop()
-                                tools.print_error(
-                                    f'安装{i.split('/')[-1]}失败', output)
-                                input()
-                                status.start()
-                        status.stop()
-                        input('安装完毕!按回车返回主界面')
-
-                    case '2.安装模块':
-                        modules = filedialog.askopenfilenames(
-                            title='请选择模块', filetypes=[('模块', '*.zip')])
-                        if not adb.is_connect():
-                            status.update('等待连接')
-                            logging.info('等待连接')
-                            status.start()
-                            adb.wait_for_connect()
-                            adb.wait_for_complete()
-                        status.update('开始安装')
-                        status.start()
-                        logging.info('开始安装')
-                        android_version = adb.get_version_of_android_from_sdk()
-                        for i in modules:
-                            logging.info(f'安装{i.split('/')[-1]}')
-                            if android_version == '7.1':
-                                adb.install_module(i)
-                            else:
-                                adb.install_module_new(i)
-                        status.stop()
-                        input('安装完毕!按回车返回主界面')
-
-                    case '3.安装XTCPatch':
+                    case '1.安装XTCPatch':
                         if not adb.is_connect():
                             status.update('等待连接')
                             logging.info('等待连接')
@@ -1439,7 +1456,7 @@ while True:
                                 model = tools.xtc_models[adb.get_innermodel()]
                                 status.stop()
                                 tools.download_file(
-                                    f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}xtcpatch.zip', 'tmp/xtcpatch.zip')
+                                    f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}xtcpatch.zip", 'tmp/xtcpatch.zip')
                                 status.update('开始安装')
                                 status.start()
                                 logging.info('开始安装')
@@ -1455,7 +1472,7 @@ while True:
                             status.stop()
                             input('你貌似不是小天才设备!按回车回到工具箱界面')
 
-                    case '4.安装CaremeOS Pro':
+                    case '2.安装CaremeOS Pro':
                         if not adb.is_connect():
                             status.update('等待连接')
                             logging.info('等待连接')
@@ -1472,7 +1489,7 @@ while True:
                                 logging.info('开始下载文件')
                                 status.stop()
                                 tools.download_file(
-                                    f'{'https://cn-nb1.rains3.com/xtceasyrootplus/' if rainyun else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}caremeospro.zip', 'tmp/caremeospro.zip')
+                                    f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}caremeospro.zip", 'tmp/caremeospro.zip')
                                 logging.info('开始安装')
                                 logging.info(
                                     '提示:安装CaremeOSPro可能需要耗费较长的时间,请耐心等待')
@@ -1493,7 +1510,7 @@ while True:
                             status.stop()
                             input('你貌似不是小天才设备!按回车回到工具箱界面')
 
-                    case '5.模拟未充电':
+                    case '3.模拟未充电':
                         if not adb.is_connect():
                             status.update('等待连接')
                             logging.info('等待连接')
@@ -1504,7 +1521,7 @@ while True:
                         logging.info('开启成功!')
                         input('按回车回到工具箱界面')
 
-                    case '6.刷入自定义固件':
+                    case '4.刷入自定义固件':
                         input('本功能为高级功能,若因使用不当造成的变砖我们概不负责!')
                         logging.info('选择mbn文件')
                         mbn = filedialog.askopenfilename(
@@ -1555,7 +1572,7 @@ while True:
                         status.stop()
                         input('按回车返回工具箱界面')
 
-                    case '7.分区管理器':
+                    case '5.分区管理器':
                         input('本功能为高级功能,若因使用不当造成的变砖我们概不负责!')
 
                         logging.info('选择mbn文件')
@@ -1621,8 +1638,8 @@ while True:
                                         qt.exit9008()
                                         input()
                                         break
-                                    shutil.copy(f'{i}.img', 'backup/')
-                                    os.remove(f'{i}.img')
+                                    shutil.copy(f"{i}.img", 'backup/')
+                                    os.remove(f"{i}.img")
                                 status.stop()
                                 input(f'读取全分区完毕!文件保存在{os.getcwd()}\\backup\n按回车回到分区界面')
                             elif partition == '#.批量写入(可用于写入备份的全分区)':
@@ -1669,7 +1686,7 @@ while True:
                                     status.stop()
                                     logging.info('刷入成功!')
                                     input('刷入成功!按回车回到分区管理界面')
-                    case '8.进入qmmi模式':
+                    case '6.进入qmmi模式':
                         input('本功能为高级功能,若因使用不当造成的变砖我们概不负责!')
                         logging.info('选择mbn文件')
                         mbn = filedialog.askopenfilename(
@@ -1707,7 +1724,7 @@ while True:
                         status.stop()
                         logging.info('已进入qmmi模式,请耐心等待开机!')
                         input('按回车返回工具箱界面')
-                    case '9.设置微信QQ开机自启动':
+                    case '7.设置微信QQ开机自启动':
                         if not adb.is_connect():
                             status.update('等待连接')
                             logging.info('等待连接')
@@ -1725,7 +1742,7 @@ while True:
                         logging.info('执行成功!')
                         status.stop()
                         input('按回车返回工具箱界面')
-                    case '10.启动投屏':
+                    case '8.启动投屏':
                         if not adb.is_connect():
                             status.update('等待连接')
                             logging.info('等待连接')
@@ -1736,7 +1753,7 @@ while True:
                             'bin/scrcpy.exe', stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
                         logging.info('执行成功!')
                         input('按回车返回工具箱界面')
-                    case '11.设置弦-安装器':
+                    case '9.设置弦-安装器':
                         status = console.status('')
                         status.start()
                         status.update('等待连接')
@@ -1761,23 +1778,27 @@ while True:
                     case _:
                         pass
 
-        case '4.关于':
+        case '6.关于':
             os.system('cls')
             tools.print_logo(version)
             print('')
             about = \
-                """XTCEasyRootPlus是一个使用Python制作的小天才电话手表一键Root程序
-本项目以GPL协议开源在Github:https://www.github.com/OnesoftQwQ/XTCEasyRootPlus
+                """
+    XTCEasyRootPlus是一个使用Python制作的小天才电话手表一键Root程序
+    本项目以GPL协议开源在Github:https://www.github.com/OnesoftQwQ/XTCEasyRootPlus
 
-作者:
-    [red]花火玩偶[/red] 和 [blue]Onesoft[/blue]
+    二次修改自Github项目[https://www.github.com/OnesoftQwQ/XTCEasyRootPlus]
+    二改 - Zxi2233
 
-特别鸣谢:
-    早茶光: 制作了XTCEasyRoot,xtcpatch,810和711的adbd,多个版本的改版桌面,并且为我解答了许多问题,[white]本项目的逻辑基本上是参考[/white][strike](抄)[/strike]的XTCEasyRoot
-    huanli233: 制作了部分改版桌面,notice,systemplus,weichatpro2
+    作者:
+        [red]花火玩偶[/red] 和 [blue]Onesoft[/blue]
 
-感谢以下成员的赞助(排名不分先后):
-    北沐丶糖糖, 四叶草, 支支"""
+    特别鸣谢:
+        早茶光: 制作了XTCEasyRoot,xtcpatch,810和711的adbd,多个版本的改版桌面,并且为我解答了许多问题,[white]本项目的逻辑基本上是参考[/white][strike](抄)[/strike]的XTCEasyRoot
+        huanli233: 制作了部分改版桌面,notice,systemplus,weichatpro2
+
+    感谢以下成员的赞助(排名不分先后):
+        北沐丶糖糖, 四叶草, 支支"""
 
             for i in about.splitlines():
                 print(i)
