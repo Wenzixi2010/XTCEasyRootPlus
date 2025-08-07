@@ -2,9 +2,11 @@
 
 ### 详情请见 [#5](https://github.com/OnesoftQwQ/XTCEasyRootPlus/issues/5)
 
-# XTCEasyRootPlus
+重制版锐意制作中，敬请期待……
 
-一个使用Python制作的小天才电话手表一键Root程序
+<center><h1>XTCEasyRootPlus</h1></center>
+
+<center>一个使用Python制作的小天才电话手表一键Root程序</center>
 
 本项目逻辑基本上参照XTCEasyRoot制作,相比XTCEasyRoot,本项目拥有更阳间的编程语言,更好看的Ui,更简化的逻辑
 
