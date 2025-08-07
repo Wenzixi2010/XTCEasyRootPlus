@@ -4,15 +4,15 @@
 
 重制版锐意制作中，敬请期待……
 
-<center><h1>XTCEasyRootPlus</h1></center>
+<h1 align="center">XTCEasyRootPlus</h1>
 
-<center>一个使用Python制作的小天才电话手表一键Root程序</center>
+<p align="center">一个使用 Python 制作的小天才电话手表一键 ROOT 程序</p>
 
-本项目逻辑基本上参照XTCEasyRoot制作,相比XTCEasyRoot,本项目拥有更阳间的编程语言,更好看的Ui,更简化的逻辑
+本项目逻辑基本上参照 XTCEasyRoot 制作,相比 XTCEasyRoot,本项目拥有更阳间的编程语言,更好看的 Ui,更简化的逻辑
 
-如果你在使用中遇到问题,请携带截图和日志来提Issues(工单),也可以QQ联系花火玩偶(3225976184)
+如果你在使用中遇到问题,请携带截图和日志来提 Issues(工单),也可以 QQ 联系花火玩偶(3225976184)
 
-如果有好的建议,同样欢迎提Issues或PR
+如果有好的建议,同样欢迎提 Issues或 PR
 
 ## 截图
 
