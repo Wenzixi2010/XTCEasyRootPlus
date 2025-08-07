@@ -8,6 +8,7 @@ from rich.console import Console
 import rich
 from urllib import parse
 from time import sleep
+import time
 import serial.tools.list_ports
 from rich.table import Table
 import zipfile
@@ -78,7 +79,7 @@ def exit_after_enter() -> NoReturn:
 
 
 def download_file(url: str, filename: str = '', progress_enable: bool = True) -> None:
-    logging.debug(f'下载文件{filename}, 链接:{url}')
+    logging.debug(f'下载文件{filename}')
     if filename == '':
         filename = parse.unquote(url.split('/')[-1].split('&')[0])
 
@@ -91,6 +92,8 @@ def download_file(url: str, filename: str = '', progress_enable: bool = True) ->
             "[green]{task.completed} / {task.total} KB",
             "•",
             TimeRemainingColumn(),
+            " ",
+            "[bold blue]share.wenzixi.top/XTC | Zxi2233[/bold blue]"
         ) as progress:
             # 发起 HTTP 请求，流式获取内容
             with requests.get(url, stream=True) as r:
@@ -115,7 +118,6 @@ def download_file(url: str, filename: str = '', progress_enable: bool = True) ->
                     for chunk in r.iter_content(chunk_size=1024):  # 每次读取 1KB
                         if chunk:  # 确保读取的内容非空
                             f.write(chunk)
-
 
 def print_logo(version: list[Any]) -> None:
     logo = r"""[#01BFEE] __   _________ _____ ______                _____             _   _____  _           
@@ -742,7 +744,7 @@ def patch_boot(
             zipf.extract('assets/stub.apk')
             shutil.copy('assets/stub.apk', './stub.apk')
             shutil.rmtree('assets/')
-            magiskboot('conpress=xz stub.apk stub.xz')
+            magiskboot('compress=xz stub.apk stub.xz')
 
         for i in ['assets/util_functions.sh', 'common/util_functions.sh']:
             if i in namelist:
