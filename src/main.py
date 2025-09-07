@@ -17,7 +17,7 @@ import threading
 from tkinter import filedialog
 from modules import logging
 
-version: list[int | Literal['b']] = [2, 6]
+version: list = [2, 8, 1]
 
 if not os.path.exists('logs/'):
     os.mkdir('logs')
@@ -27,10 +27,8 @@ debug: bool = False
 for i in sys.argv:
     if i == '--debug':
         debug = True
-if len(version) >= 3 and version[2] == 'b':
-    debug = True
 
-os.system(f'title XTCEasyRootPlus v{version[0]}.{version[1]}')
+os.system(f'title XTCEasyRootPlus v{version[0]}.{version[1]}.{version[2]}')
 console = Console()
 status = console.status('')
 print = console.print
@@ -67,11 +65,11 @@ if debug:
 os.system('cls')
 status.update('正在检查更新')
 status.start()
-logging.debug(f'当前版本:{version[0]}.{version[1]}')
+logging.debug(f'当前版本:{version[0]}.{version[1]}.{version[2]}')
 logging.info('检查最新版本')
-ZxiShare = requests.get('https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/version.json').status_code == 200
+ZxiShare = requests.get('https://share.wenzixi.top').status_code == 200
 try:  # 尝试获取版本文件
-    with requests.get(f"{('https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/')}version.json") as r:  # 获取版本信息
+    with requests.get(f"{('https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/')}version2.json") as r:  # 获取版本信息
         read = r.content
         try:
             read = json.loads(read)
@@ -81,9 +79,9 @@ try:  # 尝试获取版本文件
             logging.debug(f'版本信息原文:{read}')
             tools.exit_after_enter()
     latest_version = read
-    logging.debug(f'最新版本:{latest_version[0]}.{latest_version[1]}')
-    if ((latest_version[0] >= version[0] and latest_version[1] > version[1]) if not len(version) >= 3 else (latest_version[0] >= version[0] and latest_version[1] >= version[1])):
-        logging.info(f'发现新版本:{latest_version[0]}.{latest_version[1]}')
+    logging.debug(f'最新版本:{latest_version[0]}.{latest_version[1]}.{latest_version[2]}')
+    if (latest_version[0] > version[0] or latest_version[1] > version[1] or latest_version[2] > version[2]):
+        logging.info(f'发现新版本:{latest_version[0]}.{latest_version[1]}.{latest_version[2]}')
         logging.info('开始下载新版本......')
         status.stop()
         tools.download_file(
@@ -96,8 +94,17 @@ except requests.ConnectionError as e:  # 捕捉下载失败错误
     status.stop()
     tools.exit_after_enter()  # 退出
 
+status.stop()
 logging.info('当前版本为最新!')
-sleep(1)
+sleep(0.5)
+os.system('cls')
+tools.print_logo(version)
+print(f"\nXTCEasyRootPlus [blue]v{version[0]}.{version[1]}.{version[2]}[/blue]")
+print("""[red][!]本工具为Github开源项目，仅供个人使用，基于本项目对程序进行二次分发或改版请注明原作者信息
+关于解绑：XTCEasyRootPlus并不提供 手表强制解绑 服务，如您捡拾他人的手表，请自觉联系当地110归还失主。手表解绑属于非法行为，请归 还失主。而不要尝试通过任何手段解除挂失锁！
+任何使用本工具所造成的损失需要用户承担。
+你有5秒时间退出本程序，如果你继续运行本程序，默认同意上面的所有内容。""")
+sleep(5)
 
 if not os.path.exists('driver'):
     logging.info('初次使用,自动安装驱动!')
@@ -110,6 +117,12 @@ if not os.path.exists('driver'):
     open('driver', 'w').close()
     sleep(1)
 
+notice = requests.get("https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/notice.txt")
+if notice.status_code == 200:
+    notice = notice.text
+else:
+    notice = '[red]公告获取失败！[/red]'
+
 while True:
     # 清屏并停止状态指示
     status.stop()
@@ -120,15 +133,7 @@ while True:
     # 主菜单
     tools.print_logo(version)
     print(f"\nXTCEasyRootPlus [blue]v{version[0]}.{version[1]}{' beta' if debug else ''}{' ' + version[3] if debug else ''}[/blue]")
-    notice = requests.get("https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/notice.txt")
-    if notice.status_code == 200:
-        notice = notice.text
-        print(notice)
-    else:
-        print('[red]公告获取失败！[/red]')
-    # print('[#01BFEE]下载镜像源 | Zxi2233[/#01BFEE]')
-    # print('[green]SkyiMoo 343516728[/green]')
-    # print('[green]SourXe 590196390[/green]')
+    print(notice)
     print('本软件是[green]免费公开使用[/green]的，如果你是付费买来的请马上退款，你被骗了！\n')
     logging.debug('进入主菜单')
     choice = noneprompt.ListPrompt(
@@ -138,8 +143,9 @@ while True:
             noneprompt.Choice('2.超级恢复(救砖/降级/恢复原版系统)[复活啦！]'),
             noneprompt.Choice('3.安装本地应用安装包(APK)'),
             noneprompt.Choice('4.安装模块'),
-            noneprompt.Choice('5.工具箱'),
-            noneprompt.Choice('6.关于')
+            noneprompt.Choice('5.离线OTA'),
+            noneprompt.Choice('6.工具箱'),
+            noneprompt.Choice('7.关于')
         ]
     ).prompt().name
     logging.debug(f'选择:{choice}')
@@ -155,7 +161,11 @@ while True:
                 '你是否已阅读并同意本《免责声明》', default_choice=False).prompt()
             if not confirm:
                 continue
-            input('请拔出手表上的SIM卡,拔出后按下回车下一步')
+            # input('请拔出手表上的SIM卡,拔出后按下回车下一步')
+            confirm = noneprompt.ConfirmPrompt(
+                '你是否已将SIM卡拔出(不拔就等着验证异常吧)', default_choice=False).prompt()
+            if not confirm:
+                continue
             print('\r', end='')
             status.update("等待设备连接")
             status.start()
@@ -295,7 +305,7 @@ while True:
                     filelist = ['appstore.apk', 'notice.apk', 'wxzf.apk', 'wcp2.apk', 'datacenter.apk', launcher, 'filemanager.apk', 'settings.apk', 'systemplus.apk', 'moyeinstaller.apk']
                     for i in filelist:
                         tools.download_file(f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}apps/{i}", f"tmp/{i}", progress_enable=False)
-                    tools.download_file(f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}xtcpatch.zip", 'tmp/xtcpatch.zip', progress_enable=False)
+                    tools.download_file(f"{'https://vip.123pan.cn/1814215835/xtc_root/xtcpatch/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}xtcpatch.zip", 'tmp/xtcpatch.zip', progress_enable=False)
                     if doze:
                         tools.download_file(f"{'https://share.wenzixi.top/d/XTC/XtcEasyRootPlus/' if ZxiShare else 'https://raw.githubusercontent.com/OnesoftQwQ/XTCEasyRootPlus-Files/refs/heads/main/'}doze.zip", 'tmp/doze.zip', progress_enable=False)
 
@@ -822,7 +832,7 @@ while True:
                     tools.print_traceback_error('退出9008模式失败')
                     tools.pause()
                     break
-
+                print('重启进入Fastboot模式')
                 status.update('等待重新连接')
                 fastboot = tools.FASTBOOT('bin/fastboot.exe')
                 if not model in ('Z7A', 'Z6_DFB'):
@@ -877,7 +887,7 @@ while True:
                         break
 
                     status.update('等待重新连接')
-                    logging.info('刷入完毕,重启进入系统')
+                    logging.info('刷入完毕,重启进入qmmi/系统')
 
                 adb.wait_for_connect()
                 adb.wait_for_complete()
@@ -1066,9 +1076,8 @@ while True:
                 except adb.ADBError:
                     status.stop()
                     tools.logging_traceback('重启设备失败')
-                    tools.print_traceback_error('重启设备失败')
-                    tools.pause()
-                    break
+                    tools.print_traceback_error('重启设备失败，请尝试手动重启后按回车继续')
+                    input()
 
                 adb.wait_for_connect()
                 adb.wait_for_complete()
@@ -1166,6 +1175,8 @@ while True:
                         break
 
                 try:
+                    adb.wait_for_connect()
+                    adb.wait_for_complete()
                     logging.info('设置弦-安装器')
                     status.update('设置弦-安装器')
                     while True:
@@ -1190,9 +1201,7 @@ while True:
                 except adb.ADBError:
                     status.stop()
                     tools.logging_traceback('设置弦-安装器失败')
-                    tools.print_traceback_error('设置弦-安装器失败')
-                    tools.pause()
-                    break
+                    tools.print_traceback_error('设置弦-安装器失败，跳过')
 
                 status.stop()
                 console.rule('接下来需要你对手表进行一些手动操作', characters='=')
@@ -1214,9 +1223,7 @@ while True:
                     except adb.ADBError:
                         status.stop()
                         tools.logging_traceback('安装doze模块失败')
-                        tools.print_traceback_error('安装doze模块失败')
-                        tools.pause()
-                        break
+                        tools.print_traceback_error('安装doze模块失败，跳过')
 
                 logging.info('连接成功!')
                 status.stop()
@@ -1239,7 +1246,7 @@ while True:
                     if adb.is_connect():
                         info = adb.get_info()
                         model = tools.xtc_models[info['innermodel']]
-                        logging.info('获取成功')
+                        logging.info(f'获取成功：{model}')
                         status.stop()
                     else:
                         logging.info('获取失败,进入手动选择')
@@ -1346,6 +1353,10 @@ while True:
                 tools.pause()
 
         case '3.安装本地应用安装包(APK)':
+            os.system('cls')
+            tools.print_logo(version)
+            print(f'\nXTCEasyRootPlus [blue]v{version[0]}.{version[1]}[/blue]\n')  
+            print('请选择安装包')
             apk = filedialog.askopenfilenames(
                 title='请选择安装包', filetypes=[('安卓应用程序安装包', '*.apk')])
             if not apk:
@@ -1364,18 +1375,19 @@ while True:
                 for i in apk:
                     logging.info(f'安装{i.split('/')[-1]}')
                     output = adb.install(i)
-                    if output == 'success':
-                        logging.info('安装成功!')
-                    else:
-                        status.stop()
-                        tools.print_error(
-                            f'安装{i.split('/')[-1]}失败', output)
-                        input()
-                        status.start()
+                    status.stop()
+                    tools.print_table(
+                        f'安装{i.split('/')[-1]}完成', output)
+                    input()
+                    status.start()
                 status.stop()
                 input('安装完毕!按回车返回主界面')
 
         case '4.安装模块':
+            os.system('cls')
+            tools.print_logo(version)
+            print(f'\nXTCEasyRootPlus [blue]v{version[0]}.{version[1]}[/blue]\n')
+            print('请选择模块')
             modules = filedialog.askopenfilenames(
                 title='请选择模块', filetypes=[('模块压缩包', '*.zip')])
             if not modules:
@@ -1400,8 +1412,37 @@ while True:
                         adb.install_module_new(i)
                 status.stop()
                 input('安装完毕!按回车返回主界面')
+        case '5.离线OTA':
+            os.system('cls')
+            tools.print_logo(version)
+            print(f'\nXTCEasyRootPlus [blue]v{version[0]}.{version[1]}[/blue]\n')  
+            print('[red]本工具需要在QMMI下运行，且不能有ROOT权限！')
+            print('[green]OTA包下载：https://www.123pan.com/s/SFpbVv-5kXQv.html')
+            if input('我已进入QMMI[y/N]') == 'y':
+                print('请选择OTA文件')
+                ota_zip = filedialog.askopenfilename(
+                    title='请选择OTA文件', filetypes=[('OTA固件压缩包', '*.zip')])
+                if not ota_zip:
+                    print('[red]未选择OTA文件！[/red]')
+                    input('按回车回到主界面')
+                else:
+                    if not adb.is_connect():
+                        status.update('等待连接')
+                        logging.info('等待连接')
+                        status.start()
+                        adb.wait_for_connect()
+                        adb.wait_for_complete()
+                    status.update('开始推送')
+                    status.start()
+                    logging.info('开始推送')
+                    adb.push(f'{ota_zip}', '/sdcard/xtc/ota_f_vota.zip')
+                    adb.shell('am start -n com.xtc.setting/.module.secretcode.view.activity.OfflineOtaActivity')
+                    status.stop()
+                    print('[green]推送完成，请打开手表，点击离线OTA-开始升级即可')
+                    input('按回车回到主界面')
 
-        case '5.工具箱':
+
+        case '6.工具箱':
             while True:
                 os.system('cls')
                 tools.print_logo(version)
@@ -1778,7 +1819,7 @@ while True:
                     case _:
                         pass
 
-        case '6.关于':
+        case '7.关于':
             os.system('cls')
             tools.print_logo(version)
             print('')
@@ -1787,10 +1828,12 @@ while True:
     XTCEasyRootPlus是一个使用Python制作的小天才电话手表一键Root程序
     本项目以GPL协议开源在Github:https://www.github.com/OnesoftQwQ/XTCEasyRootPlus
 
-    二次修改自Github项目[https://www.github.com/OnesoftQwQ/XTCEasyRootPlus]
-    二改 - Zxi2233
+    二次修改自Github项目 https://www.github.com/OnesoftQwQ/XTCEasyRootPlus
+    二改修改作者 - Zxi2233
 
-    作者:
+    ------------------------------------------------------------------------------
+
+    原作者:
         [red]花火玩偶[/red] 和 [blue]Onesoft[/blue]
 
     特别鸣谢:
