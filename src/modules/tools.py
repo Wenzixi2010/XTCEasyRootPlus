@@ -93,7 +93,7 @@ def download_file(url: str, filename: str = '', progress_enable: bool = True) ->
             "•",
             TimeRemainingColumn(),
             " ",
-            "[bold blue]share.wenzixi.top/XTC | Zxi2233[/bold blue]"
+            "[bold blue]SourXe | Zxi2233[/bold blue]"
         ) as progress:
             # 发起 HTTP 请求，流式获取内容
             with requests.get(url, stream=True) as r:
@@ -120,18 +120,15 @@ def download_file(url: str, filename: str = '', progress_enable: bool = True) ->
                             f.write(chunk)
 
 def print_logo(version: list[Any]) -> None:
-    logo = r"""[#01BFEE] __   _________ _____ ______                _____             _   _____  _           
- \ \ / /__   __/ ____|  ____|              |  __ \           | | |  __ \| |          
-  \ V /   | | | |    | |__   __ _ ___ _   _| |__) |___   ___ | |_| |__) | |_   _ ___ 
-   > <    | | | |    |  __| / _` / __| | | |  _  // _ \ / _ \| __|  ___/| | | | / __|
-  / . \   | | | |____| |___| (_| \__ \ |_| | | \ \ (_) | (_) | |_| |    | | |_| \__ \
- /_/ \_\  |_|  \_____|______\__,_|___/\__, |_|  \_\___/ \___/ \__|_|    |_|\__,_|___/
-                                       __/ |                                         
-                                      |___/                                          """
+    logo = r"""[#01BFEE]   _  _________________          ___            __  ___  __       
+  | |/_/_  __/ ___/ __/__ ___ __/ _ \___  ___  / /_/ _ \/ /_ _____
+ _>  <  / / / /__/ _// _ `/ // / , _/ _ \/ _ \/ __/ ___/ / // (_-<
+/_/|_| /_/  \___/___/\_,_/\_, /_/|_|\___/\___/\__/_/  /_/\_,_/___/
+                         /___/                                    """
     console = Console()
     print = console.print
     logo = logo[0:-(len(str(version[0]))+len(str(version[1]))+2)]
-    logo = logo+f'[/#01BFEE][blue]v{version[0]}.{version[1]}[/blue]'
+    logo = logo+f'[/#01BFEE][blue]v{version[0]}.{version[1]}.{version[2]}[/blue]'
     print(logo)
 
 
@@ -332,6 +329,15 @@ def print_error(title: str, content: str) -> None:
     print = console.print
     table = Table()
     table.add_column(f'错误:{title}')
+    table.add_row(content)
+    print(table)
+
+def print_table(title: str, content: str) -> None:
+    logging.error(f'完成:{title}\n{content}')
+    console = Console()
+    print = console.print
+    table = Table()
+    table.add_column(f'完成:{title}')
     table.add_row(content)
     print(table)
 
